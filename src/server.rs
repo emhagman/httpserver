@@ -32,7 +32,7 @@ pub struct HttpServer<'a> {
 impl<'a> HttpServer<'a> {
     pub fn new() -> Self {
         Self {
-            address: "127.0.0.1:7878",
+            address: "0.0.0.0:7878",
             routes: Arc::new(Mutex::new(HashMap::new())),
             listener: None,
         }
@@ -69,6 +69,7 @@ pub struct HttpRequest<'a> {
     pub method: Option<&'a str>,
     pub http_version: Option<&'a str>,
     pub headers: Option<&'a Vec<HttpHeader>>,
+    pub body: Option<String>,
 }
 
 #[derive(Debug)]
@@ -100,6 +101,7 @@ fn handle_connection<'a>(routes: Arc<Mutex<HashMap<HttpRoute<'a>, RouteRef>>>, m
         method: None,
         http_version: None,
         headers: None,
+        body: None,
     };
 
     println!("{}", request);
@@ -131,6 +133,7 @@ fn handle_connection<'a>(routes: Arc<Mutex<HashMap<HttpRoute<'a>, RouteRef>>>, m
     if body.len() > 0 {
         // TODO: Read Content-Type header application/x-www-form-urlencoded
         let body_content = body[0];
+        request_object.body = Some(body[0].to_string());
         let data: Vec<&str> = body_content.split("&").collect();
         println!("{:?}", data);
     }
